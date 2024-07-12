@@ -110,7 +110,7 @@ void moveSnake(struct Snake *s,int d) {
       k = s->df;
       while(s != NULL) {
         mvaddch(s->y,s->x, ' ');
-        if(s->df > 0) {
+        if(s->df == 0) {
           s->x--;
         } else if(j < k) {
           s->y++;

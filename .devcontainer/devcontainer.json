@@ -1,0 +1,14 @@
+{
+    "name":"cdev",
+    "dockerComposeFile":["../docker-compose.yml"],
+    "service": "cdev",
+	"workspaceFolder": "/root/opt/",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-vscode.cpptools",
+				"ms-vscode.cpptools-extension-pack"
+			]
+		}
+	}
+}

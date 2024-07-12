@@ -1,0 +1,9 @@
+services:
+  cdev:
+    build: .
+    container_name: cdev
+    volumes:
+      - .:/root/opt/
+    tty: true
+    ports:
+      - 22:22

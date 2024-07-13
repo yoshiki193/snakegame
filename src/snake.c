@@ -7,17 +7,14 @@ struct Snake {
   int x;
   int y;
   int component;
-  int df;
-  int uf;
-  int length;
   struct Snake *next;
 };
 
 void run();
-void makeSnake(struct Snake **s, int y, int x, int l);
+void makeSnake(struct Snake **s, int y, int x);
 void initSnake(struct Snake **s);
 int showSnake(struct Snake *s, int ch, int lch);
-void moveSnake(struct Snake *s, int  d);
+void moveSnake(struct Snake *s, int d);
 
 int main(int argc, char **argv) {
   initscr();
@@ -30,7 +27,7 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-void makeSnake(struct Snake **s, int y, int x, int l) {
+void makeSnake(struct Snake **s, int y, int x) {
   struct Snake *ptr,*new;
   new = (struct Snake *)malloc(sizeof(struct Snake));
   if(*s == NULL) {
@@ -45,31 +42,47 @@ void makeSnake(struct Snake **s, int y, int x, int l) {
 
   new->y = y;
   new->x = x;
-  new->df = 0;
-  new->uf = 0;
-  new->length = l;
   new->component = '#';
   new->next = NULL;
 }
 
 void initSnake(struct Snake **s) {
-  makeSnake(s,0,0,4);
-  makeSnake(s,0,-1,4);
-  makeSnake(s,0,-2,4);
-  makeSnake(s,0,-3,4);
-  makeSnake(s,0,-4,4);
+  struct Snake *ptr;
+  makeSnake(s,0,5);
+  makeSnake(s,0,4);
+  makeSnake(s,0,3);
+  makeSnake(s,0,2);
+  makeSnake(s,0,1);
+  makeSnake(s,0,0);
+  ptr = *s;
+  while(ptr != NULL) {
+    mvaddch(ptr->y,ptr->x,ptr->component);
+    ptr = ptr->next;
+  }
 }
 
 int showSnake(struct Snake *s, int ch, int lch) {
-  struct Snake *ptr;
-  ptr = s;
-
   if((ch != KEY_LEFT) && (ch != KEY_RIGHT) && (ch != KEY_DOWN) && (ch != KEY_UP)) {
     switch(lch) {
       case KEY_LEFT:
+        if(lch != KEY_RIGHT) {
+          moveSnake(s,1);
+        }
         break;
       case KEY_RIGHT:
+        if(lch != KEY_LEFT) {
+          moveSnake(s,2);
+        }
         break;
+      case KEY_DOWN:
+        if(lch != KEY_UP) {
+          moveSnake(s,3);
+        }
+        break;
+      case KEY_UP:
+        if(lch != KEY_DOWN) {
+          moveSnake(s,4);
+        }
       default:
         break;
     }
@@ -77,86 +90,72 @@ int showSnake(struct Snake *s, int ch, int lch) {
     switch(ch) {
       case KEY_LEFT:
         if(lch != KEY_RIGHT) {
-          moveSnake(ptr,1);
+          moveSnake(s,1);
           lch = ch;
         }
         break;
       case KEY_RIGHT:
         if(lch != KEY_LEFT) {
-          moveSnake(ptr,2);
+          moveSnake(s,2);
           lch = ch;
         }
         break;
       case KEY_DOWN:
         if(lch != KEY_UP) {
-          moveSnake(ptr,3);
+          moveSnake(s,3);
           lch = ch;
         }
         break;
+      case KEY_UP:
+        if(lch != KEY_DOWN) {
+          moveSnake(s,4);
+          lch = ch;
+        }
       default:
         break;
     }
   }
-
   return lch;
 }
 
-void moveSnake(struct Snake *s,int d) {
-  int i = 0;
-  int j = 0;
-  int k = 0;
+void moveSnake(struct Snake *s, int d) {
+  int lx = 0;
+  int ly = 0;
+  int tmpx = 0;
+  int tmpy = 0;
+  lx = s->x;
+  ly = s->y;
   switch(d) {
     case 1:
-      k = s->df;
-      while(s != NULL) {
-        mvaddch(s->y,s->x, ' ');
-        if(s->df == 0) {
-          s->x--;
-        } else if(j < k) {
-          s->y++;
-          s->df++;
-          j++;
-        } else {
-          s->x++;
-        }
-        mvaddch(s->y,s->x,s->component);
-        s = s->next;
-        i++;
-      }
+      s->x--;
       break;
     case 2:
-      while(s != NULL) {
-        mvaddch(s->y,s->x, ' ');
-        s->x++;
-        mvaddch(s->y,s->x,s->component);
-        s = s->next;
-      }
+      s->x++;
       break;
     case 3:
-      i = s->df;
-      j = 2;
-      while(s != NULL) {
-        mvaddch(s->y,s->x, ' ');
-        if(i >= 0) {
-          s->y++;
-          if(s->df != s->length) s->df++;
-        } else {
-          s->x++;
-        }
-        mvaddch(s->y,s->x,s->component);
-        i--;
-        s = s->next;
-      }
+      s->y++;
       break;
-    default:
+    case 4:
+      s->y--;
       break;
   }
+  mvaddch(s->y,s->x,s->component);
+  while(s->next != NULL) {
+    s = s->next;
+    tmpx = s->x;
+    tmpy = s->y;
+    s->x = lx;
+    s->y = ly;
+    lx = tmpx;
+    ly = tmpy;
+  }
+  mvaddch(ly,lx,' ');
 }
 
 void run() {
   int ch = 0,lch,loop = 0;
   struct Snake *s = NULL;
-  timeout(-1);
+  timeout(50);
   initSnake(&s);
   while((ch = getch()) != 'q') {
     loop++;

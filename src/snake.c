@@ -6,14 +6,26 @@
 struct Snake {
   int x;
   int y;
+  int nx;
+  int ny;
   int component;
   struct Snake *next;
 };
 
+struct Feed {
+  int x;
+  int y;
+  int component;
+  struct Feed *next;
+};
+
 void run();
+void makeFeed(struct Feed **f, int sy, int sx);
+void initFeed(struct Feed **f, int sy, int sx);
 void makeSnake(struct Snake **s, int y, int x);
 void initSnake(struct Snake **s);
-int moveSnake(struct Snake *s, int ch, int lch);
+int moveSnake(struct Snake *s, int ch, int lch, int sy, int sx);
+void addSnake(struct Snake **s, int lch);
 
 int main(int argc, char **argv) {
   initscr();
@@ -26,9 +38,50 @@ int main(int argc, char **argv) {
   return 0;
 }
 
+void makeFeed(struct Feed **f, int sy, int sx) {
+  struct Feed *ptr,*new;
+  int x;
+  int y;
+
+  x = rand()%(sx-1)+0;
+  y = rand()%(sy-1)+0;
+
+  new = (struct Feed *)malloc(sizeof(struct Feed));
+
+  if(*f == NULL) {
+    *f = new;
+  }else {
+    ptr = *f;
+    while(ptr->next != NULL) {
+      ptr = ptr->next;
+    }
+    ptr->next = new;
+  }
+
+  new->y = y;
+  new->x = x;
+  new->component = '@';
+  new->next = NULL;
+}
+
+void initFeed(struct Feed **f, int sy, int sx) {
+  struct Feed *ptr;
+
+  makeFeed(f,sy,sx);
+
+  ptr = *f;
+
+  while(ptr != NULL) {
+    mvaddch(ptr->y,ptr->x,ptr->component);
+    ptr = ptr->next;
+  }
+}
+
 void makeSnake(struct Snake **s, int y, int x) {
   struct Snake *ptr,*new;
+
   new = (struct Snake *)malloc(sizeof(struct Snake));
+
   if(*s == NULL) {
     *s = new;
   }else {
@@ -47,26 +100,24 @@ void makeSnake(struct Snake **s, int y, int x) {
 
 void initSnake(struct Snake **s) {
   struct Snake *ptr;
-  makeSnake(s,0,5);
-  makeSnake(s,0,4);
-  makeSnake(s,0,3);
-  makeSnake(s,0,2);
-  makeSnake(s,0,1);
-  makeSnake(s,0,0);
+  int i;
+
+  for(i = 10;i >= 0;i--) makeSnake(s,0,i);
+
   ptr = *s;
+
   while(ptr != NULL) {
     mvaddch(ptr->y,ptr->x,ptr->component);
     ptr = ptr->next;
   }
 }
 
-int moveSnake(struct Snake *s, int ch, int lch) {
-  int lx = 0;
-  int ly = 0;
+int moveSnake(struct Snake *s, int ch, int lch, int sy, int sx) {
+  int lx = s->x;
+  int ly = s->y;
   int tmpx = 0;
   int tmpy = 0;
-  lx = s->x;
-  ly = s->y;
+
   switch(ch) {
     case KEY_LEFT:
       if(lch == KEY_RIGHT) {
@@ -109,7 +160,13 @@ int moveSnake(struct Snake *s, int ch, int lch) {
       break;
   }
 
+  if(s->x > sx) s->x -= sx;
+  if(s->x < 0) s->x += sx;
+  if(s->y > sy) s->y -= sy;
+  if(s->y < 0) s->y += sy;
+
   mvaddch(s->y,s->x,s->component);
+
   while(s->next != NULL) {
     s = s->next;
     tmpx = s->x;
@@ -118,25 +175,58 @@ int moveSnake(struct Snake *s, int ch, int lch) {
     s->y = ly;
     lx = tmpx;
     ly = tmpy;
+    s->nx = lx;
+    s->ny = ly;
   }
+
   mvaddch(ly,lx,' ');
+
   return lch;
 }
 
+void addSnake(struct Snake **s, int lch) {
+  int x = 0;
+  int y = 0;
+  struct Snake *ptr,*new;
+
+  new = (struct Snake *)malloc(sizeof(struct Snake));
+
+  if(*s == NULL) {
+    *s = new;
+  }else {
+    ptr = *s;
+    while(ptr->next != NULL) {
+      ptr = ptr->next;
+    }
+    ptr->next = new;
+  }
+
+  new->y = ptr->ny;
+  new->x = ptr->nx;
+  new->component = '#';
+  new->next = NULL;
+}
+
 void run() {
+  int sx;
+  int sy;
   int ch = 0;
   int lch = 0;
   int loop = 0;
   struct Snake *s = NULL;
-  timeout(0);
+  struct Feed *f = NULL;
+
+  getmaxyx(stdscr,sy,sx);
+  timeout(50);
   initSnake(&s);
+  initFeed(&f,sy,sx);
+
   while(((ch = getch()) != 'q')) {
     loop++;
     if((ch != KEY_RIGHT) && (ch != KEY_LEFT) && (ch != KEY_UP) && (ch != KEY_DOWN)) {
-      lch = moveSnake(s,lch,lch);
+      lch = moveSnake(s,lch,lch,sy,sx);
     } else {
-      lch = moveSnake(s,ch,lch);
+      lch = moveSnake(s,ch,lch,sy,sx);
     }
-    
   }
 }

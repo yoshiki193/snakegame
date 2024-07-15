@@ -69,23 +69,43 @@ int moveSnake(struct Snake *s, int ch, int lch) {
   ly = s->y;
   switch(ch) {
     case KEY_LEFT:
-      s->x--;
-      break;
+      if(lch == KEY_RIGHT) {
+        s->x++;
+        break;
+      } else {
+        lch = ch;
+        s->x--;
+        break;
+      }
     case KEY_RIGHT:
-      if(lch == 0) {
+      if(lch == KEY_LEFT) {
+        s->x--;
+        break;
+      } else {
         lch = ch;
         s->x++;
         break;
-      } else if(ch == KEY_LEFT) {
-        
-      };
+      }
     case KEY_DOWN:
-      s->y++;
-      break;
+      if(lch == KEY_UP) {
+        s->y--;
+        break;
+      } else {
+        lch = ch;
+        s->y++;
+        break;
+      }
     case KEY_UP:
-      s->y--;
-      break;
+      if(lch == KEY_DOWN) {
+        s->y++;
+        break;
+      } else {
+        lch = ch;
+        s->y--;
+        break;
+      }
     default:
+      return lch;
       break;
   }
 
@@ -108,10 +128,15 @@ void run() {
   int lch = 0;
   int loop = 0;
   struct Snake *s = NULL;
-  timeout(50);
+  timeout(0);
   initSnake(&s);
-  while((ch = getch()) != 'q') {
+  while(((ch = getch()) != 'q')) {
     loop++;
-    lch = moveSnake(s, ch, lch);
+    if((ch != KEY_RIGHT) && (ch != KEY_LEFT) && (ch != KEY_UP) && (ch != KEY_DOWN)) {
+      lch = moveSnake(s,lch,lch);
+    } else {
+      lch = moveSnake(s,ch,lch);
+    }
+    
   }
 }

@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 struct Snake {
   int x;
@@ -21,7 +22,7 @@ struct Feed {
 
 void run();
 void makeFeed(struct Feed **f, int sy, int sx);
-void initFeed(struct Feed **f, int sy, int sx);
+void showFeed(struct Feed *f);
 void makeSnake(struct Snake **s, int y, int x);
 void initSnake(struct Snake **s);
 int moveSnake(struct Snake *s, int ch, int lch, int sy, int sx);
@@ -42,9 +43,9 @@ void makeFeed(struct Feed **f, int sy, int sx) {
   struct Feed *ptr,*new;
   int x;
   int y;
-
-  x = rand()%(sx-1)+0;
-  y = rand()%(sy-1)+0;
+  
+  x = rand()%(sx);
+  y = rand()%(sy);
 
   new = (struct Feed *)malloc(sizeof(struct Feed));
 
@@ -64,16 +65,10 @@ void makeFeed(struct Feed **f, int sy, int sx) {
   new->next = NULL;
 }
 
-void initFeed(struct Feed **f, int sy, int sx) {
-  struct Feed *ptr;
-
-  makeFeed(f,sy,sx);
-
-  ptr = *f;
-
-  while(ptr != NULL) {
-    mvaddch(ptr->y,ptr->x,ptr->component);
-    ptr = ptr->next;
+void showFeed(struct Feed *f) {
+  while(f != NULL) {
+    mvaddch(f->y,f->x,f->component);
+    f = f->next;
   }
 }
 
@@ -102,7 +97,7 @@ void initSnake(struct Snake **s) {
   struct Snake *ptr;
   int i;
 
-  for(i = 10;i >= 0;i--) makeSnake(s,0,i);
+  for(i = 5;i >= 0;i--) makeSnake(s,0,i);
 
   ptr = *s;
 
@@ -160,9 +155,9 @@ int moveSnake(struct Snake *s, int ch, int lch, int sy, int sx) {
       break;
   }
 
-  if(s->x > sx) s->x -= sx;
+  if(s->x >= sx) s->x -= sx;
   if(s->x < 0) s->x += sx;
-  if(s->y > sy) s->y -= sy;
+  if(s->y >= sy) s->y -= sy;
   if(s->y < 0) s->y += sy;
 
   mvaddch(s->y,s->x,s->component);
@@ -208,6 +203,7 @@ void addSnake(struct Snake **s, int lch) {
 }
 
 void run() {
+  int i;
   int sx;
   int sy;
   int ch = 0;
@@ -218,8 +214,10 @@ void run() {
 
   getmaxyx(stdscr,sy,sx);
   timeout(50);
+  srand((int)time(NULL));
   initSnake(&s);
-  initFeed(&f,sy,sx);
+  for(i = 0;i < 3;i++) makeFeed(&f,sy,sx);
+  showFeed(f);
 
   while(((ch = getch()) != 'q')) {
     loop++;
@@ -228,5 +226,6 @@ void run() {
     } else {
       lch = moveSnake(s,ch,lch,sy,sx);
     }
+    showFeed(f);
   }
 }

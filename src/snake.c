@@ -97,8 +97,6 @@ int moveSnake(struct Snake *s, int ch, int lch, int sy, int sx) {
 
 void addSnake(struct Snake **s, int lch) {
   struct Snake *ptr,*new;
-  int y = 0;
-  int x = 0;
 
   new = (struct Snake *)malloc(sizeof(struct Snake));
 

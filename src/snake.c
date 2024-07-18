@@ -21,7 +21,7 @@ struct Feed {
   struct Feed *next;
 };
 
-void run(int sy, int sx);
+int run(int sy, int sx);
 void makeFeed(struct Feed **f, int sy, int sx);
 int eraseFeed(struct Feed **f, struct Snake *s);
 void showFeed(struct Feed *f, struct Snake *s);
@@ -31,40 +31,108 @@ void addSnake(struct Snake **s, int lch);
 void initSnake(struct Snake **s);
 int collisionDetection(struct Snake *s);
 void printWall(int sy, int sx);
-void showTitle();
+void showTitle(char *fn);
+void showGameover(char *fn, int score, int sy, int sx);
 
 int main(int argc, char **argv) {
+  char *fn;
+  FILE *fp;
+
+  if(argc != 2) {
+    fprintf(stderr, "ランキングファイルを指定してください\n");
+    exit(1);
+  }
+
+  argv++;
+
+  if((fp = fopen(*argv, "r")) == NULL) {
+    fprintf(stderr, "ランキングファイルがありません\n");
+    exit(1);
+  }
+
+  fclose(fp);
+
+  fn = *argv;
+
   initscr();
   noecho();
   cbreak();
   curs_set(0);
   keypad(stdscr,TRUE);
   timeout(50);
-  showTitle();
+  showTitle(fn);
+  flushinp();
   endwin();
   return 0;
 }
 
-void showTitle() {
+void showTitle(char *fn) {
   int sy;
   int sx;
   int ch;
+  int score;
 
   getmaxyx(stdscr,sy,sx);
-  clear();
-  mvprintw(sy/2-2,(sx-110)/2," oooooooo8  oooo   oooo      o      oooo   oooo ooooooooooo   ooooooo8       o      oooo     oooo ooooooooooo ");
-  mvprintw(sy/2-1,(sx-110)/2,"888          8888o  88      888      888  o88    888    88  o888    88      888      8888o   888   888    88  ");
-  mvprintw(sy/2  ,(sx-110)/2," 888oooooo   88 888o88     8  88     888888      888ooo8    888    oooo    8  88     88 888o8 88   888ooo8    ");
-  mvprintw(sy/2+1,(sx-110)/2,"        888  88   8888    8oooo88    888  88o    888    oo  888o    88    8oooo88    88  888  88   888    oo  ");
-  mvprintw(sy/2+2,(sx-110)/2,"o88oooo888  o88o    88  o88o  o888o o888o o888o o888ooo8888  888ooo888  o88o  o888o o88o  8  o88o o888ooo8888 ");
 
-  while((ch = getch()) != '3') {
-    if(ch == '1') {
+  while((ch = getch()) != 'q') {
+    if(sx > 110) {
+      mvprintw(sy/2-2,(sx-110)/2," oooooooo8  oooo   oooo      o      oooo   oooo ooooooooooo   ooooooo8       o      oooo     oooo ooooooooooo ");
+      mvprintw(sy/2-1,(sx-110)/2,"888          8888o  88      888      888  o88    888    88  o888    88      888      8888o   888   888    88  ");
+      mvprintw(sy/2  ,(sx-110)/2," 888oooooo   88 888o88     8  88     888888      888ooo8    888    oooo    8  88     88 888o8 88   888ooo8    ");
+      mvprintw(sy/2+1,(sx-110)/2,"        888  88   8888    8oooo88    888  88o    888    oo  888o    88    8oooo88    88  888  88   888    oo  ");
+      mvprintw(sy/2+2,(sx-110)/2,"o88oooo888  o88o    88  o88o  o888o o888o o888o o888ooo8888  888ooo888  o88o  o888o o88o  8  o88o o888ooo8888 ");
+    } else {
+      mvprintw(sy/2,(sx-9)/2,"SNAKEGAME");
+    }
+
+    mvprintw(sy/2+5,(sx-12)/2,"[s]. PLAY");
+    mvprintw(sy/2+6,(sx-12)/2,"[q]. EXIT");
+
+    if(ch == 's') {
       clear();
-      run(sy,sx);
-      break;
+      score = run(sy,sx);
+      clear();
+      showGameover(fn,score,sy,sx);
+      clear();
     }
   }
+}
+
+void showGameover(char *fn, int score, int sy, int sx) {
+  FILE *fp;
+  char *r;
+
+  if((fp = fopen(fn, "r")) == NULL) {
+    fprintf(stderr, "ランキングファイルがありません\n");
+    exit(1);
+  }
+
+  r = (char *)malloc(sizeof(char)*15);
+  fgets(r,15,fp);
+
+  if((fp = fopen(fn, "w")) == NULL) {
+    fprintf(stderr, "ランキングファイルがありません\n");
+    exit(1);
+  }
+
+  mvprintw(sy/2-1,(sx-9)/2,"GAME OVER");
+  mvprintw(sy/2,(sx-20)/2,"--------------------");
+
+  if(atoi(r) < score) {
+    mvprintw(sy/2+1,(sx-(17 + (int)log10(score)))/2,"NEW RECORD SCORE:%d",score);
+    sprintf(r,"%d",score);
+    fputs(r,fp);
+    fputc('\n',fp);
+  } else {
+    mvprintw(sy/2+1,(sx-(13 + (int)log10(score)))/2,"RESULT SCORE:%d",score);
+    fputs(r,fp);
+  }
+
+  mvprintw(sy/2+3,(sx-9)/2,"[q]. EXIT");
+
+  fclose(fp);
+
+  while(getch() != 'q');
 }
 
 void makeFeed(struct Feed **f, int sy, int sx) {
@@ -294,12 +362,13 @@ void printWall(int sy, int sx) {
   }
 }
 
-void run(int sy, int sx) {
+int run(int sy, int sx) {
   int i;
   int ch = 0;
   int lch = 0;
   int loop = 0;
   int t1 = 0;
+  int t2 = 0;
   int flag = 0;
   int goflag = 0;
   int lv = 1;
@@ -313,11 +382,11 @@ void run(int sy, int sx) {
   printWall(sy,sx);
   srand((int)time(NULL));
   initSnake(&s);
-  for(i = 0;i < feedq;i++) makeFeed(&f,sy,sx);
 
   while(((ch = getch()) != 'q')) {
     loop++;
 
+    if(f == NULL) for(i = 0;i < feedq;i++) makeFeed(&f,sy,sx);
     showFeed(f, s);
 
     if((ch != KEY_RIGHT) && (ch != KEY_LEFT) && (ch != KEY_UP) && (ch != KEY_DOWN)) {
@@ -333,8 +402,11 @@ void run(int sy, int sx) {
     flag = eraseFeed(&f,s);
 
     if(flag == 1) {
+      t2 = loop;
       score = score + lv + 10;
       addSnake(&s, lch);
+    } else if((((loop - t2) % 100) == 0) && ((score - 10) > 0)){
+      score = score - 10;
     }
 
     if(score >= ((round(pow(lv,2)) * 10))) {
@@ -343,6 +415,7 @@ void run(int sy, int sx) {
     }
 
     mvprintw(3,sx + 1,"Lv.%d",lv);
+    mvprintw(4,sx + 1,"SCORE.              ");
     mvprintw(4,sx + 1,"SCORE.%d",score);
     if((t1 != 0) && ((loop - t1) != 50)) {
       if(((loop - t1) % 5) == 0){
@@ -359,7 +432,7 @@ void run(int sy, int sx) {
         t1 = 0;
         blink = 0;
     }
-
-    if(f == NULL) for(i = 0;i < feedq;i++) makeFeed(&f,sy,sx);
   }
+
+  return score;
 }

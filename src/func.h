@@ -20,7 +20,7 @@ int eraseFeed(struct Feed **f, struct Snake *s);
 void showFeed(struct Feed *f, struct Snake *s);
 void makeSnake(struct Snake **s, int y, int x);
 int moveSnake(struct Snake *s, int ch, int lch, int sy, int sx);
-void addSnake(struct Snake **s, int lch);
+void addSnake(struct Snake **s);
 void initSnake(struct Snake **s);
 int collisionDetection(struct Snake *s);
 void printWall(int sy, int sx);

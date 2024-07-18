@@ -95,7 +95,7 @@ int moveSnake(struct Snake *s, int ch, int lch, int sy, int sx) {
   return lch;
 }
 
-void addSnake(struct Snake **s, int lch) {
+void addSnake(struct Snake **s) {
   struct Snake *ptr,*new;
 
   new = (struct Snake *)malloc(sizeof(struct Snake));

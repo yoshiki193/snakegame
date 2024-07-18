@@ -123,7 +123,7 @@ int run(int sy, int sx) {
     if(flag == 1) {
       t2 = loop;
       score = score + lv + 10;
-      addSnake(&s, lch);
+      addSnake(&s);
     } else if((((loop - t2) % 100) == 0) && ((score - 10) > 0)){
       score = score - 10;
     }

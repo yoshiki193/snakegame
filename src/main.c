@@ -7,14 +7,14 @@ int main(int argc, char **argv) {
   FILE *fp;
 
   if(argc != 2) {
-    fprintf(stderr, "ランキングファイルを指定してください\n");
+    fprintf(stderr, "スコアファイルを指定してください\n");
     exit(1);
   }
 
   argv++;
 
   if((fp = fopen(*argv, "r")) == NULL) {
-    fprintf(stderr, "ランキングファイルがありません\n");
+    fprintf(stderr, "スコアファイルがありません\n");
     exit(1);
   }
 

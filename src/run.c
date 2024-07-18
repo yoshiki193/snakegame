@@ -41,7 +41,7 @@ void showGameover(char *fn, int score, int sy, int sx) {
   char *r;
 
   if((fp = fopen(fn, "r")) == NULL) {
-    fprintf(stderr, "ランキングファイルがありません\n");
+    fprintf(stderr, "スコアファイルがありません\n");
     exit(1);
   }
 
@@ -49,7 +49,7 @@ void showGameover(char *fn, int score, int sy, int sx) {
   fgets(r,15,fp);
 
   if((fp = fopen(fn, "w")) == NULL) {
-    fprintf(stderr, "ランキングファイルがありません\n");
+    fprintf(stderr, "スコアファイルがありません\n");
     exit(1);
   }
 

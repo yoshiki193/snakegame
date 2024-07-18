@@ -1,10 +1,6 @@
 #include "func.h"
 #include <ncurses.h>
-#include <unistd.h>
-#include <string.h>
 #include <stdlib.h>
-#include <time.h>
-#include <math.h>
 
 int main(int argc, char **argv) {
   char *fn;

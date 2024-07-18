@@ -1,4 +1,4 @@
-LDLIBS=-lncurses -lm
+LDLIBS:=-lncurses -lm
 
 snake: main.o run.o feed.o snake.o
 

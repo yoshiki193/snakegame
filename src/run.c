@@ -128,7 +128,7 @@ int run(int sy, int sx) {
       score = score - 10;
     }
 
-    if(score >= ((round(pow(lv,2)) * 10))) {
+    if(score >= ((pow(lv,2) * 10))) {
       lv++;
       t1 = loop;
     }

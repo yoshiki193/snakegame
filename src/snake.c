@@ -85,8 +85,8 @@ void showTitle(char *fn) {
       mvprintw(sy/2,(sx-9)/2,"SNAKEGAME");
     }
 
-    mvprintw(sy/2+5,(sx-12)/2,"[s]. PLAY");
-    mvprintw(sy/2+6,(sx-12)/2,"[q]. EXIT");
+    mvprintw(sy/2+5,(sx-9)/2,"[s]. PLAY");
+    mvprintw(sy/2+6,(sx-9)/2,"[q]. EXIT");
 
     if(ch == 's') {
       clear();

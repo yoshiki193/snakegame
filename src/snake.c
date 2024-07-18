@@ -112,7 +112,7 @@ void addSnake(struct Snake **s, int lch) {
 
   new->y = ptr->ny;
   new->x = ptr->nx;
-  new->component = '#';
+  new->component = 'o';
   new->next = NULL;
 }
 

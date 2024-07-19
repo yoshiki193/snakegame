@@ -14,7 +14,7 @@ struct Feed {
   struct Feed *next;
 };
 
-int run(int sy, int sx);
+int run(int sy, int sx, int v);
 void makeFeed(struct Feed **f, int sy, int sx);
 int eraseFeed(struct Feed **f, struct Snake *s);
 void showFeed(struct Feed *f, struct Snake *s);

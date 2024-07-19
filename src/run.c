@@ -9,10 +9,12 @@ void showTitle(char *fn) {
   int sx;
   int ch;
   int score;
+  int v = 50;
 
   getmaxyx(stdscr,sy,sx);
 
   while((ch = getch()) != 'q') {
+
     if(sx > 110) {
       mvprintw(sy/2-2,(sx-110)/2," oooooooo8  oooo   oooo      o      oooo   oooo ooooooooooo   ooooooo8       o      oooo     oooo ooooooooooo ");
       mvprintw(sy/2-1,(sx-110)/2,"888          8888o  88      888      888  o88    888    88  o888    88      888      8888o   888   888    88  ");
@@ -25,13 +27,16 @@ void showTitle(char *fn) {
 
     mvprintw(sy/2+5,(sx-9)/2,"[s]. PLAY");
     mvprintw(sy/2+6,(sx-9)/2,"[q]. EXIT");
+    
+    if(ch == 'x') v = 25;
 
     if(ch == 's') {
       clear();
-      score = run(sy,sx);
+      score = run(sy,sx,v);
       clear();
       showGameover(fn,score,sy,sx);
       clear();
+      v = 50;
     }
   }
 }
@@ -81,7 +86,7 @@ void printWall(int sy, int sx) {
   }
 }
 
-int run(int sy, int sx) {
+int run(int sy, int sx, int v) {
   int i;
   int ch = 0;
   int lch = 0;
@@ -96,6 +101,7 @@ int run(int sy, int sx) {
   int feedq = sx/10;
   struct Snake *s = NULL;
   struct Feed *f = NULL;
+  timeout(v);
 
   sx -= 14;
   printWall(sy,sx);

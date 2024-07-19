@@ -3,6 +3,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <math.h>
+#include <unistd.h>
 
 void showTitle(char *fn) {
   int sy;
@@ -140,7 +141,7 @@ int run(int sy, int sx, int v) {
     }
 
     mvprintw(3,sx + 1,"Lv.%d",lv);
-    mvprintw(4,sx + 1,"SCORE.              ");
+    mvprintw(4,sx + 1,"SCORE.       ");
     mvprintw(4,sx + 1,"SCORE.%d",score);
     if((t1 != 0) && ((loop - t1) != 50)) {
       if(((loop - t1) % 5) == 0){

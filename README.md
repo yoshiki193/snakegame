@@ -1,2 +1,2 @@
 # SNAKEGAME
-make後./snake rank.txtで起動
+make後"./snake rank.txt"で起動
